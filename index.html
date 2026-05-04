@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вызовы стройконтроля — СТРОЙ-АЛЬЯНС</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #1e3a5f; --primary-light: #264d7a; --accent: #f59e0b; --accent-dark: #d97706;
+            --bg: #f1f5f9; --card: #ffffff; --text: #1e293b; --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --radius: 10px;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        .header { background: var(--primary); color: white; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-md); position: sticky; top: 0; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .header-icon { width: 38px; height: 38px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .header-title { font-size: 18px; font-weight: 700; }
+        .header-subtitle { font-size: 11px; opacity: 0.65; margin-top: 1px; }
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .btn { padding: 9px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; transition: all 0.18s; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-outline:hover { background: var(--bg); }
+        .btn-sm { padding: 6px 14px; font-size: 13px; }
+        .icon-btn { width: 36px; height: 36px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.18s; }
+        .icon-btn-ghost { background: rgba(255,255,255,0.1); color: white; }
+        .icon-btn-ghost:hover { background: rgba(255,255,255,0.22); }
+        .main { padding: 24px; max-width: 1440px; margin: 0 auto; }
+        .stats-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+        .stat-card { background: var(--card); border-radius: var(--radius); padding: 16px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); cursor: pointer; transition: all 0.18s; border: 2px solid transparent; }
+        .stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .stat-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; background: color-mix(in srgb, var(--sc,#64748b) 15%, transparent); color: var(--sc,#64748b); }
+        .stat-count { font-size: 26px; font-weight: 700; line-height: 1; color: var(--sc,#64748b); }
+        .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+        .toolbar { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; }
+        .search-wrap { flex: 1; position: relative; }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+        .search-input { width: 100%; padding: 10px 12px 10px 38px; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; font-family: inherit; color: var(--text); background: var(--card); transition: border-color 0.18s; }
+        .search-input:focus { outline: none; border-color: var(--accent); }
+        .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .filter-tab { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: white; color: var(--text-muted); font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.18s; display: flex; align-items: center; gap: 5px; }
+        .filter-tab:hover { border-color: var(--accent); color: var(--text); }
+        .filter-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-tab-count { background: rgba(255,255,255,0.25); padding: 1px 7px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+        .filter-tab:not(.active) .filter-tab-count { background: var(--bg); color: var(--text-muted); }
+        .calls-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+        .call-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; transition: all 0.18s; border-left: 4px solid var(--sc,#64748b); }
+        .call-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .card-header { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+        .card-title { font-size: 15px; font-weight: 600; line-height: 1.3; flex: 1; }
+        .card-badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: color-mix(in srgb, var(--sc,#64748b) 14%, transparent); color: var(--sc,#64748b); white-space: nowrap; flex-shrink: 0; }
+        .card-body { padding: 12px 16px; }
+        .card-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 13px; }
+        .card-row:last-child { margin-bottom: 0; }
+        .card-row-icon { color: var(--text-muted); font-size: 14px; flex-shrink: 0; margin-top: 1px; width: 16px; text-align: center; }
+        .card-row-label { color: var(--text-muted); font-size: 12px; margin-right: 4px; }
+        .card-row-value { color: var(--text); font-weight: 500; }
+        .card-note { color: var(--text-muted); font-size: 12px; font-style: italic; }
+        .card-footer { padding: 10px 16px; background: #f8fafc; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .card-date { font-size: 11px; color: var(--text-muted); }
+        .card-actions { display: flex; gap: 6px; }
+        .btn-action { padding: 5px 12px; border-radius: 6px; border: none; font-size: 12px; font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.18s; }
+        .btn-advance { background: var(--primary); color: white; }
+        .btn-advance:hover { background: var(--primary-light); }
+        .btn-detail { background: var(--border); color: var(--text-muted); }
+        .btn-detail:hover { background: #d1d5db; color: var(--text); }
+        .resp-tag { display: inline-flex; align-items: center; gap: 4px; background: #eff6ff; color: #1d4ed8; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 500; }
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); }
+        .empty-icon { font-size: 64px; margin-bottom: 16px; opacity: 0.4; }
+        .empty-title { font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+        .empty-text { font-size: 14px; max-width: 400px; margin: 0 auto; }
+        .loading-spinner { display: flex; align-items: center; justify-content: center; padding: 80px; color: var(--text-muted); flex-direction: column; gap: 16px; }
+        .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
+        .modal { background: var(--card); border-radius: 16px; width: 100%; max-width: 560px; box-shadow: var(--shadow-lg); transform: scale(0.95) translateY(20px); transition: transform 0.2s; max-height: 90vh; overflow-y: auto; }
+        .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+        .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .modal-title { font-size: 18px; font-weight: 700; }
+        .modal-close { width: 32px; height: 32px; border-radius: 8px; border: none; background: var(--bg); cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+        .modal-close:hover { background: var(--border); color: var(--text); }
+        .modal-body { padding: 20px 24px; }
+        .modal-footer { padding: 16px 24px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+        .req { color: #ef4444; margin-left: 2px; }
+        .form-input, .form-textarea { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; font-family: inherit; color: var(--text); background: white; transition: border-color 0.18s, box-shadow 0.18s; }
+        .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,158,11,0.15); }
+        .form-textarea { resize: vertical; min-height: 80px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .detail-section { margin-bottom: 20px; }
+        .detail-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 10px; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .detail-field { background: var(--bg); border-radius: 8px; padding: 10px 12px; }
+        .detail-field-label { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; }
+        .detail-field-value { font-size: 14px; font-weight: 500; color: var(--text); }
+        .status-timeline { display: flex; flex-direction: column; }
+        .timeline-step { display: flex; align-items: flex-start; gap: 12px; }
+        .timeline-indicator { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+        .timeline-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+        .timeline-dot.done { background: #10b981; color: white; }
+        .timeline-dot.current { background: var(--accent); color: white; }
+        .timeline-dot.pending { background: var(--border); color: var(--text-muted); }
+        .timeline-line { width: 2px; height: 24px; background: var(--border); margin: 2px 0; }
+        .timeline-content { padding: 4px 0 20px; }
+        .timeline-title { font-size: 13px; font-weight: 600; }
+        .timeline-date { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .settings-info { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #1d4ed8; margin-bottom: 16px; line-height: 1.6; }
+        .divider { height: 1px; background: var(--border); margin: 16px 0; }
+        .steps-list { margin-top: 8px; padding-left: 18px; line-height: 1.9; font-size: 13px; color: var(--text-muted); }
+        code { background: var(--bg); padding: 1px 5px; border-radius: 4px; font-size: 12px; color: var(--primary); }
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
+        .toast { background: #1e293b; color: white; padding: 12px 18px; border-radius: 10px; font-size: 14px; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; animation: slideIn 0.3s ease; max-width: 360px; }
+        .toast.success { background: #059669; }
+        .toast.error { background: #dc2626; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @media (max-width: 900px) { .stats-bar { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 600px) { .stats-bar { grid-template-columns: repeat(2, 1fr); } .calls-grid { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-left">
+        <div class="header-icon">🏗️</div>
+        <div>
+            <div class="header-title">Вызовы стройконтроля</div>
+            <div class="header-subtitle">ООО «СТРОЙ-АЛЬЯНС»</div>
+        </div>
+    </div>
+    <div class="header-right">
+        <button class="icon-btn icon-btn-ghost" onclick="openSettings()" title="Настройки подключения">⚙️</button>
+        <button class="btn btn-primary" onclick="openAddModal()">＋ Добавить вызов</button>
+    </div>
+</header>
+
+<main class="main">
+    <div class="stats-bar">
+        <div class="stat-card" style="--sc:#64748b" onclick="setFilter('all')">
+            <div class="stat-icon">📋</div>
+            <div><div class="stat-count" id="cntAll">0</div><div class="stat-label">Всего вызовов</div></div>
+        </div>
+        <div class="stat-card" style="--sc:#3b82f6" onclick="setFilter('new')">
+            <div class="stat-icon">🆕</div>
+            <div><div class="stat-count" id="cntNew">0</div><div class="stat-label">Ожидают вызова</div></div>
+        </div>
+        <div class="stat-card" style="--sc:#10b981" onclick="setFilter('customer_called')">
+            <div class="stat-icon">📞</div>
+            <div><div class="stat-count" id="cntCC">0</div><div class="stat-label">Заказчик вызван</div></div>
+        </div>
+        <div class="stat-card" style="--sc:#8b5cf6" onclick="setFilter('customer_accepted')">
+            <div class="stat-icon">✅</div>
+            <div><div class="stat-count" id="cntCA">0</div><div class="stat-label">Заказчик принял</div></div>
+        </div>
+        <div class="stat-card" style="--sc:#374151" onclick="setFilter('closed')">
+            <div class="stat-icon">🔒</div>
+            <div><div class="stat-count" id="cntClosed">0</div><div class="stat-label">Закрыто</div></div>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="searchInput" placeholder="Поиск по работе, объекту, подрядчику, ответственному..." oninput="renderCalls()">
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="loadCalls()">🔄 Обновить</button>
+    </div>
+
+    <div class="filter-tabs">
+        <button class="filter-tab active" data-status="all" onclick="setFilter('all')">Все <span class="filter-tab-count" id="tabAll">0</span></button>
+        <button class="filter-tab" data-status="new" onclick="setFilter('new')">🆕 Новые <span class="filter-tab-count" id="tabNew">0</span></button>
+        <button class="filter-tab" data-status="customer_called" onclick="setFilter('customer_called')">📞 Заказчик вызван <span class="filter-tab-count" id="tabCC">0</span></button>
+        <button class="filter-tab" data-status="customer_accepted" onclick="setFilter('customer_accepted')">✅ Заказчик принял <span class="filter-tab-count" id="tabCA">0</span></button>
+        <button class="filter-tab" data-status="tech_called" onclick="setFilter('tech_called')">🔔 Тех. заказчик вызван <span class="filter-tab-count" id="tabTC">0</span></button>
+        <button class="filter-tab" data-status="closed" onclick="setFilter('closed')">🔒 Закрытые <span class="filter-tab-count" id="tabClosed">0</span></button>
+    </div>
+
+    <div id="callsContainer">
+        <div class="loading-spinner"><div class="spinner"></div><span>Загрузка данных...</span></div>
+    </div>
+</main>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ADD MODAL -->
+<div class="modal-overlay" id="addModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">➕ Новый вызов</div>
+            <button class="modal-close" onclick="closeModal('addModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Подрядчик <span class="req">*</span></label>
+                <input type="text" class="form-input" id="f_contractor" placeholder="Название организации-подрядчика">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Наименование работы <span class="req">*</span></label>
+                <input type="text" class="form-input" id="f_workName" placeholder="Например: Монтаж терракотовой плитки">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Местоположение <span class="req">*</span></label>
+                    <input type="text" class="form-input" id="f_location" placeholder="Кор. 1, в/о А-Г, оси...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Дата и время вызова <span class="req">*</span></label>
+                    <input type="datetime-local" class="form-input" id="f_callDate">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Примечания от подрядчика</label>
+                <textarea class="form-textarea" id="f_notes" placeholder="Доп. требования, условия допуска..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Ответственный инженер</label>
+                <input type="text" class="form-input" id="f_responsible" placeholder="ФИО ответственного">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('addModal')">Отмена</button>
+            <button class="btn btn-primary" onclick="saveCall()">💾 Сохранить</button>
+        </div>
+    </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title" id="detailTitle">Детали вызова</div>
+            <button class="modal-close" onclick="closeModal('detailModal')">✕</button>
+        </div>
+        <div class="modal-body" id="detailBody"></div>
+        <div class="modal-footer" id="detailFooter"></div>
+    </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">⚙️ Настройки подключения</div>
+            <button class="modal-close" onclick="closeModal('settingsModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="settings-info">
+                ℹ️ URL Google Apps Script уже настроен и зашит в код — все участники команды автоматически работают с одной таблицей.
+            </div>
+            <div class="form-group">
+                <label class="form-label">URL Apps Script (можно изменить)</label>
+                <input type="url" class="form-input" id="s_scriptUrl" placeholder="https://script.google.com/macros/s/XXXXXXX/exec">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('settingsModal')">Отмена</button>
+            <button class="btn btn-primary" onclick="saveSettings()">💾 Сохранить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzq8crVrKFFdk3GHZyeiElgXhmcHcW081SoUUaAcPj2zvFIkKu4DTKkBilsdwoomqOgSA/exec';
+
+const STATUS = {
+    'new':               { label: 'Новый',                icon: '🆕', color: '#3b82f6', next: 'customer_called',   nextLabel: 'Вызвать заказчика' },
+    'customer_called':   { label: 'Заказчик вызван',      icon: '📞', color: '#10b981', next: 'customer_accepted', nextLabel: 'Заказчик принял' },
+    'customer_accepted': { label: 'Заказчик принял',      icon: '✅', color: '#8b5cf6', next: 'tech_called',        nextLabel: 'Вызвать тех. заказчика' },
+    'tech_called':       { label: 'Тех. заказчик вызван', icon: '🔔', color: '#f59e0b', next: 'closed',             nextLabel: 'Закрыть вызов' },
+    'closed':            { label: 'Закрыт',               icon: '🔒', color: '#374151', next: null,                nextLabel: null },
+};
+
+let allCalls = [];
+let currentFilter = 'all';
+let scriptUrl = localStorage.getItem('stroy_scriptUrl') || DEFAULT_SCRIPT_URL;
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('s_scriptUrl').value = scriptUrl;
+    loadCalls();
+    const tmr = new Date(); tmr.setDate(tmr.getDate()+1); tmr.setHours(12,0,0,0);
+    document.getElementById('f_callDate').value = tmr.toISOString().slice(0,16);
+    document.querySelectorAll('.modal-overlay').forEach(el =>
+        el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); })
+    );
+});
+
+async function loadCalls() {
+    const container = document.getElementById('callsContainer');
+    container.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><span>Загрузка данных...</span></div>';
+    try {
+        const res = await fetch(scriptUrl + '?action=getAll');
+        const data = await res.json();
+        if (data.success) {
+            allCalls = data.calls.map(normalizeRow);
+            localStorage.setItem('stroy_cache', JSON.stringify(allCalls));
+        } else throw new Error(data.error);
+    } catch (err) {
+        const cached = localStorage.getItem('stroy_cache');
+        if (cached) { allCalls = JSON.parse(cached); showToast('⚠️ Нет связи — кэш', 'error'); }
+        else allCalls = [];
+    }
+    updateStats(); renderCalls();
+}
+
+function normalizeRow(r) {
+    if (r['ID'] !== undefined) return {
+        id: String(r['ID']), createdAt: r['Создан']||'', contractor: r['Подрядчик']||'',
+        workName: r['Наименование работы']||'', location: r['Местоположение']||'',
+        callDate: r['Дата вызова']||'', notes: r['Примечания']||'',
+        responsible: r['Ответственный']||'', status: r['Статус']||'new',
+        customerCallDate: r['Дата вызова заказчику']||'', techCallDate: r['Дата вызова тех. заказчику']||'',
+    };
+    return r;
+}
+
+function updateStats() {
+    const c = {all:allCalls.length,new:0,customer_called:0,customer_accepted:0,tech_called:0,closed:0};
+    allCalls.forEach(x=>{ if(c[x.status]!==undefined) c[x.status]++; });
+    document.getElementById('cntAll').textContent    = c.all;
+    document.getElementById('cntNew').textContent    = c.new;
+    document.getElementById('cntCC').textContent     = c.customer_called;
+    document.getElementById('cntCA').textContent     = c.customer_accepted;
+    document.getElementById('cntClosed').textContent = c.closed;
+    document.getElementById('tabAll').textContent    = c.all;
+    document.getElementById('tabNew').textContent    = c.new;
+    document.getElementById('tabCC').textContent     = c.customer_called;
+    document.getElementById('tabCA').textContent     = c.customer_accepted;
+    document.getElementById('tabTC').textContent     = c.tech_called;
+    document.getElementById('tabClosed').textContent = c.closed;
+    localStorage.setItem('stroy_cache', JSON.stringify(allCalls));
+}
+
+function setFilter(s) {
+    currentFilter = s;
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.toggle('active', t.dataset.status===s));
+    renderCalls();
+}
+
+function renderCalls() {
+    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+    let list = allCalls.filter(c => {
+        if (currentFilter !== 'all' && c.status !== currentFilter) return false;
+        if (q) return [c.workName,c.contractor,c.location,c.responsible,c.notes].some(f=>f&&f.toLowerCase().includes(q));
+        return true;
+    });
+    list.sort((a,b) => {
+        if(a.status==='closed'&&b.status!=='closed') return 1;
+        if(b.status==='closed'&&a.status!=='closed') return -1;
+        return new Date(b.createdAt)-new Date(a.createdAt);
+    });
+    const container = document.getElementById('callsContainer');
+    if (!list.length) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">' + (q?'Ничего не найдено':'Вызовов пока нет') + '</div><div class="empty-text">' + (q?'Попробуйте изменить запрос':'Нажмите «Добавить вызов»') + '</div></div>';
+        return;
+    }
+    container.innerHTML = '<div class="calls-grid">' + list.map(renderCard).join('') + '</div>';
+}
+
+function renderCard(c) {
+    const sc = STATUS[c.status]||STATUS['new'];
+    return '<div class="call-card" style="--sc:' + sc.color + '">' +
+        '<div class="card-header"><div class="card-title">' + esc(c.workName) + '</div><div class="card-badge">' + sc.icon + ' ' + sc.label + '</div></div>' +
+        '<div class="card-body">' +
+        '<div class="card-row"><span class="card-row-icon">🏢</span><div><span class="card-row-label">Подрядчик:</span><span class="card-row-value">' + esc(c.contractor) + '</span></div></div>' +
+        '<div class="card-row"><span class="card-row-icon">📍</span><div><span class="card-row-label">Объект:</span><span class="card-row-value">' + esc(c.location) + '</span></div></div>' +
+        '<div class="card-row"><span class="card-row-icon">📅</span><div><span class="card-row-label">Дата вызова:</span><span class="card-row-value">' + fmtDT(c.callDate) + '</span></div></div>' +
+        (c.responsible ? '<div class="card-row"><span class="card-row-icon">👤</span><div><span class="resp-tag">👤 ' + esc(c.responsible) + '</span></div></div>' : '') +
+        (c.notes ? '<div class="card-row"><span class="card-row-icon">💬</span><div class="card-note">' + esc(c.notes) + '</div></div>' : '') +
+        '</div>' +
+        '<div class="card-footer"><span class="card-date">Добавлен: ' + fmtD(c.createdAt) + '</span>' +
+        '<div class="card-actions"><button class="btn-action btn-detail" onclick="openDetail(\'' + c.id + '\')">Детали</button>' +
+        (sc.next ? '<button class="btn-action btn-advance" onclick="advanceStatus(\'' + c.id + '\')">→ ' + sc.nextLabel + '</button>' : '') +
+        '</div></div></div>';
+}
+
+async function advanceStatus(id) {
+    const c = allCalls.find(x=>x.id===id); if(!c) return;
+    const sc = STATUS[c.status]; if(!sc||!sc.next) return;
+    const newStatus = sc.next, now = new Date().toISOString();
+    c.status = newStatus;
+    if(newStatus==='customer_called') c.customerCallDate=now;
+    if(newStatus==='tech_called') c.techCallDate=now;
+    updateStats(); renderCalls();
+    showToast('✅ ' + STATUS[newStatus].icon + ' ' + STATUS[newStatus].label);
+    try {
+        const updates = {'Статус':newStatus};
+        if(newStatus==='customer_called') updates['Дата вызова заказчику']=now;
+        if(newStatus==='tech_called') updates['Дата вызова тех. заказчику']=now;
+        await fetch(scriptUrl, {method:'POST', body:JSON.stringify({action:'update',id,updates})});
+    } catch(e) { showToast('⚠️ Статус изменён локально, таблица не обновлена','error'); }
+    localStorage.setItem('stroy_cache', JSON.stringify(allCalls));
+}
+
+async function saveCall() {
+    const contractor=document.getElementById('f_contractor').value.trim();
+    const workName=document.getElementById('f_workName').value.trim();
+    const location=document.getElementById('f_location').value.trim();
+    const callDate=document.getElementById('f_callDate').value;
+    if(!contractor||!workName||!location||!callDate){showToast('❌ Заполните все обязательные поля','error');return;}
+    const newCall = {
+        id:Date.now().toString(), createdAt:new Date().toISOString(),
+        contractor, workName, location, callDate,
+        notes:document.getElementById('f_notes').value.trim(),
+        responsible:document.getElementById('f_responsible').value.trim(),
+        status:'new', customerCallDate:'', techCallDate:'',
+    };
+    allCalls.unshift(newCall); updateStats(); renderCalls(); closeModal('addModal'); showToast('✅ Вызов добавлен!','success');
+    ['f_contractor','f_workName','f_location','f_notes','f_responsible'].forEach(id=>document.getElementById(id).value='');
+    try {
+        const res=await fetch(scriptUrl,{method:'POST',body:JSON.stringify({action:'add',call:newCall})});
+        const data=await res.json(); if(data.success&&data.id) newCall.id=data.id;
+    } catch(e){showToast('⚠️ Добавлено локально, таблица не обновлена','error');}
+    localStorage.setItem('stroy_cache', JSON.stringify(allCalls));
+}
+
+function openDetail(id) {
+    const c=allCalls.find(x=>x.id===id); if(!c) return;
+    const sc=STATUS[c.status];
+    const order=['new','customer_called','customer_accepted','tech_called','closed'];
+    const curIdx=order.indexOf(c.status);
+    const timeline=order.map((s,i)=>{
+        const cfg=STATUS[s];
+        const cls=i<curIdx?'done':(i===curIdx?'current':'pending');
+        const dot=i<curIdx?'✓':(i+1);
+        const dateMap={new:c.createdAt,customer_called:c.customerCallDate,tech_called:c.techCallDate};
+        const dateStr=dateMap[s]?fmtDT(dateMap[s]):'';
+        return '<div class="timeline-step"><div class="timeline-indicator"><div class="timeline-dot ' + cls + '">' + dot + '</div>' + (i<order.length-1?'<div class="timeline-line"></div>':'') + '</div><div class="timeline-content"><div class="timeline-title" style="' + (i===curIdx?'color:var(--accent);font-weight:700;':'') + '">' + cfg.icon + ' ' + cfg.label + '</div>' + (dateStr?'<div class="timeline-date">' + dateStr + '</div>':'') + '</div></div>';
+    }).join('');
+    document.getElementById('detailTitle').textContent=sc.icon + ' ' + c.workName;
+    document.getElementById('detailBody').innerHTML=
+        '<div class="detail-section"><div class="detail-section-title">Информация о вызове</div><div class="detail-grid">' +
+        '<div class="detail-field" style="grid-column:1/-1"><div class="detail-field-label">Подрядчик</div><div class="detail-field-value">' + esc(c.contractor) + '</div></div>' +
+        '<div class="detail-field" style="grid-column:1/-1"><div class="detail-field-label">Наименование работы</div><div class="detail-field-value">' + esc(c.workName) + '</div></div>' +
+        '<div class="detail-field"><div class="detail-field-label">Местоположение</div><div class="detail-field-value">' + esc(c.location) + '</div></div>' +
+        '<div class="detail-field"><div class="detail-field-label">Дата вызова подрядчика</div><div class="detail-field-value">' + fmtDT(c.callDate) + '</div></div>' +
+        (c.responsible?'<div class="detail-field"><div class="detail-field-label">Ответственный</div><div class="detail-field-value">' + esc(c.responsible) + '</div></div>':'') +
+        (c.notes?'<div class="detail-field" style="grid-column:1/-1"><div class="detail-field-label">Примечания</div><div class="detail-field-value">' + esc(c.notes) + '</div></div>':'') +
+        (c.customerCallDate?'<div class="detail-field"><div class="detail-field-label">Дата вызова заказчика</div><div class="detail-field-value">' + fmtDT(c.customerCallDate) + '</div></div>':'') +
+        (c.techCallDate?'<div class="detail-field"><div class="detail-field-label">Дата вызова тех. заказчика</div><div class="detail-field-value">' + fmtDT(c.techCallDate) + '</div></div>':'') +
+        '</div></div>' +
+        '<div class="detail-section"><div class="detail-section-title">Цепочка вызовов</div><div class="status-timeline">' + timeline + '</div></div>';
+    document.getElementById('detailFooter').innerHTML=sc.next
+        ?'<button class="btn btn-outline" onclick="closeModal(\'detailModal\')">Закрыть</button><button class="btn btn-primary" onclick="advanceStatus(\'' + c.id + '\');closeModal(\'detailModal\')">→ ' + sc.nextLabel + '</button>'
+        :'<button class="btn btn-primary" onclick="closeModal(\'detailModal\')">Закрыть</button>';
+    openModal('detailModal');
+}
+
+function saveSettings() {
+    const newUrl = document.getElementById('s_scriptUrl').value.trim();
+    if (newUrl) { scriptUrl = newUrl; localStorage.setItem('stroy_scriptUrl', scriptUrl); }
+    closeModal('settingsModal'); showToast('✅ Настройки сохранены');
+    loadCalls();
+}
+
+const openModal  = id => document.getElementById(id).classList.add('open');
+const closeModal = id => document.getElementById(id).classList.remove('open');
+const openAddModal = () => openModal('addModal');
+const openSettings = () => openModal('settingsModal');
+
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtD(s){if(!s)return'—';try{return new Date(s).toLocaleDateString('ru-RU');}catch{return s;}}
+function fmtDT(s){if(!s)return'—';try{const d=new Date(s);return d.toLocaleDateString('ru-RU')+' '+d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});}catch{return s;}}
+
+function showToast(msg,type='success'){
+    const c=document.getElementById('toastContainer');
+    const t=document.createElement('div'); t.className='toast ' + type; t.textContent=msg; c.appendChild(t);
+    setTimeout(()=>{t.style.transition='all .3s';t.style.opacity='0';t.style.transform='translateX(100%)';setTimeout(()=>t.remove(),300);},3000);
+}
+</script>
+</body>
+</html>
